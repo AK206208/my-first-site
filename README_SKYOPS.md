@@ -16,3 +16,10 @@ Upload these files to GitHub repository root. Vercel will redeploy automatically
 
 This is a prototype/demo. Do not use it as official aviation information.
 Always verify official SWIM / AIP / NOTAM sources before operational use.
+
+
+## v0.2 map fix
+
+- Removed Leaflet SRI attributes to avoid CSS/JS blocking.
+- Added fallback Leaflet CSS.
+- Added map.invalidateSize() refresh logic.
