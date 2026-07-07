@@ -1,0 +1,9 @@
+{
+  "name": "小3ぼうけんドリル",
+  "short_name": "小3ドリル",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fff7dc",
+  "theme_color": "#ffb703",
+  "icons": []
+}

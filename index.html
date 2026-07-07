@@ -1,137 +1,57 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkyOps Board v0.1</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://unpkg.com">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>小3ぼうけんドリル</title>
+  <meta name="description" content="小学3年生向けの毎日10分で続けやすい学習サイト。算数・国語・理科・社会のクイズ、復習、親用ダッシュボードつき。" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div>
-      <p class="eyebrow">SWIM / NOTAM / Weather briefing prototype</p>
-      <h1>SkyOps Board</h1>
-    </div>
-    <div class="status-pill">
-      <span class="dot"></span>
-      v0.1 Demo
-    </div>
-  </header>
+  <div class="app-shell">
+    <header class="site-header">
+      <button class="logo" data-nav="home" aria-label="ホームへ戻る">
+        <span class="logo-mark">⚡</span>
+        <span>
+          <strong>小3ぼうけんドリル</strong>
+          <small>1日10分の学習ミッション</small>
+        </span>
+      </button>
+      <nav class="top-nav" aria-label="メインメニュー">
+        <button data-nav="home">ホーム</button>
+        <button data-nav="mission">今日のミッション</button>
+        <button data-nav="subjects">教科</button>
+        <button data-nav="review">復習</button>
+        <button data-nav="parent">おうちの人</button>
+      </nav>
+      <button class="hamburger" id="menuButton" aria-label="メニューを開く">☰</button>
+    </header>
 
-  <main class="layout">
-    <section class="hero card">
+    <main>
+      <section id="home" class="view active-view"></section>
+      <section id="mission" class="view"></section>
+      <section id="subjects" class="view"></section>
+      <section id="quiz" class="view"></section>
+      <section id="review" class="view"></section>
+      <section id="parent" class="view"></section>
+      <section id="lesson" class="view"></section>
+    </main>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <template id="subjectCardTemplate">
+    <article class="subject-card">
+      <div class="subject-icon"></div>
       <div>
-        <p class="eyebrow">Kyoritsu-style Ops Dashboard</p>
-        <h2>今日の運航影響を、1画面で。</h2>
-        <p class="lead">
-          拠点別NOTAM、重要度、確認状況、地図表示をまとめて確認する試作版です。
-          公式情報ではなく、社内検討・デモ用です。
-        </p>
+        <h3></h3>
+        <p></p>
       </div>
-      <div class="hero-actions">
-        <label class="upload-label">
-          NOTAM XMLを読み込む
-          <input id="xmlUpload" type="file" accept=".xml,.txt" />
-        </label>
-        <button id="exportKmlBtn" class="secondary">KML出力</button>
-      </div>
-    </section>
-
-    <section class="summary-grid">
-      <article class="metric card">
-        <span>重要</span>
-        <strong id="criticalCount">0</strong>
-        <small>運航影響が大きい可能性</small>
-      </article>
-      <article class="metric card">
-        <span>要確認</span>
-        <strong id="warningCount">0</strong>
-        <small>担当者確認が必要</small>
-      </article>
-      <article class="metric card">
-        <span>確認済み</span>
-        <strong id="checkedCount">0</strong>
-        <small>社内チェック済み</small>
-      </article>
-      <article class="metric card">
-        <span>対象空港</span>
-        <strong id="airportCount">0</strong>
-        <small>表示中の拠点数</small>
-      </article>
-    </section>
-
-    <section class="workspace">
-      <aside class="panel card">
-        <h3>拠点フィルター</h3>
-        <div class="airport-buttons" id="airportButtons"></div>
-
-        <h3>表示条件</h3>
-        <div class="filters">
-          <label><input type="checkbox" value="critical" checked /> 重要</label>
-          <label><input type="checkbox" value="warning" checked /> 要確認</label>
-          <label><input type="checkbox" value="info" checked /> 情報</label>
-        </div>
-
-        <h3>クイック操作</h3>
-        <button id="todayBtn" class="full">本日有効のみ</button>
-        <button id="resetBtn" class="full secondary">条件リセット</button>
-
-        <div class="notice">
-          <strong>注意</strong>
-          <p>
-            この画面は試作です。運航判断には必ずSWIM/AIP等の公式情報を確認してください。
-          </p>
-        </div>
-      </aside>
-
-      <section class="map-card card">
-        <div id="map"></div>
-      </section>
-
-      <section class="list-card card">
-        <div class="list-header">
-          <div>
-            <p class="eyebrow">NOTAM list</p>
-            <h3 id="listTitle">全拠点</h3>
-          </div>
-          <input id="searchBox" type="search" placeholder="キーワード検索：RWY / RAIM / 障害物..." />
-        </div>
-        <div id="notamList" class="notam-list"></div>
-      </section>
-    </section>
-
-    <section class="briefing card">
-      <div>
-        <p class="eyebrow">Morning Briefing</p>
-        <h3>朝ブリーフィング案</h3>
-      </div>
-      <pre id="briefingText"></pre>
-      <button id="copyBriefingBtn" class="secondary">ブリーフィングをコピー</button>
-    </section>
-  </main>
-
-  <template id="notamTemplate">
-    <article class="notam-item">
-      <div class="notam-top">
-        <span class="badge"></span>
-        <span class="airport"></span>
-        <span class="period"></span>
-      </div>
-      <h4></h4>
-      <p class="notam-body"></p>
-      <div class="notam-actions">
-        <label class="checkline">
-          <input type="checkbox" class="checkInput" />
-          確認済み
-        </label>
-        <input class="commentInput" type="text" placeholder="社内コメントを入力..." />
-      </div>
+      <button class="primary-button">はじめる</button>
     </article>
   </template>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="script.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
