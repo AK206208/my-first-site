@@ -1,0 +1,1 @@
+function hello(){document.getElementById('msg').textContent='🚀 公開成功！';}
